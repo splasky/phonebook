@@ -23,7 +23,12 @@ typedef struct __PHONE_BOOK_ENTRY {
     struct __PHONE_BOOK_ENTRY* pNext;
 } entry;
 
-entry* findName(char lastName[], entry* pHead);
-entry* append(char lastName[], entry* e);
+#define HASH_TABLE_SIZE 349900
+typedef unsigned int (*hash_function)(const char* str, unsigned int length);
+
+entry* findName(char lastName[], entry* table[], hash_function func);
+void append(char lastName[], entry* table[], hash_function func);
+unsigned hash(char* name, hash_function func);
+void initHashTable(entry* table[]);
 
 #endif

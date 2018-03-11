@@ -20,10 +20,10 @@ phonebook_orig: $(SRCS_common) phonebook_orig.c phonebook_orig.h
 		-DIMPL="\"$@.h\"" -o $@ \
 		$(SRCS_common) $@.c
 
-phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h
+phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h hash_function.o
 	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
-		-DIMPL="\"$@.h\"" -o $@ \
-		$(SRCS_common) $@.c
+		-DIMPL="\"$@.h\"" -DHASH -o $@ \
+		$(SRCS_common) $@.c hash_function.o
 
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches
@@ -45,6 +45,9 @@ plot: output.txt
 
 calculate: calculate.c
 	$(CC) $(CFLAGS_common) $^ -o $@
+
+clear_cache:
+	@echo 1 | sudo tee /proc/sys/vm/drop_caches
 
 .PHONY: clean
 clean:

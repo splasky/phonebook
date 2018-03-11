@@ -14,6 +14,11 @@
 
 #define DICT_FILE "./dictionary/words.txt"
 
+#ifdef HASH
+#include "./hash_function.h"
+hash_function default_hash_function = RSHASH;
+#endif
+
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {
     struct timespec diff;
@@ -42,6 +47,10 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+#if defined(HASH)
+    entry* hashTable[HASH_TABLE_SIZE];
+    initHashTable(hashTable);
+#endif
     /* build the entry */
     entry *pHead, *e;
     pHead = (entry *) malloc(sizeof(entry));
@@ -58,7 +67,11 @@ int main(int argc, char *argv[])
             i++;
         line[i - 1] = '\0';
         i = 0;
+#if defined(HASH)
+        append(line, hashTable, default_hash_function);
+#else
         e = append(line, e);
+#endif
     }
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time1 = diff_in_second(start, end);
@@ -72,16 +85,23 @@ int main(int argc, char *argv[])
     char input[MAX_LAST_NAME_SIZE] = "zyxel";
     e = pHead;
 
-    assert(findName(input, e) &&
-           "Did you implement findName() in " IMPL "?");
+#if defined(HASH)
+
+#else
+    assert(findName(input, e) && "Did you implement findName() in " IMPL "?");
     assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
+#endif
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
+#if defined(HASH)
+    findName(input, hashTable, default_hash_function);
+#else
     findName(input, e);
+#endif
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time2 = diff_in_second(start, end);
 
