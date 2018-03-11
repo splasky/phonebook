@@ -46,6 +46,9 @@ plot: output.txt
 calculate: calculate.c
 	$(CC) $(CFLAGS_common) $^ -o $@
 
+clear_cache:
+	@echo 1 | sudo tee /proc/sys/vm/drop_caches
+
 .PHONY: clean
 clean:
 	$(RM) $(EXEC) *.o perf.* \
