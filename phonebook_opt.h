@@ -21,9 +21,10 @@ typedef struct __PHONE_BOOK_ENTRY {
     char lastName[MAX_LAST_NAME_SIZE];
     details* detail;
     struct __PHONE_BOOK_ENTRY* pNext;
+    struct __PHONE_BOOK_ENTRY* pLast;
 } entry;
 
-#define HASH_TABLE_SIZE 349900
+#define HASH_TABLE_SIZE 1000
 typedef unsigned int (*hash_function)(const char* str, unsigned int length);
 
 entry* findName(char lastName[], entry* table[], hash_function func);
