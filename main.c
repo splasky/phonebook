@@ -17,6 +17,7 @@
 #ifdef HASH
 #include "./hash_function.h"
 hash_function default_hash_function = RSHASH;
+unsigned int HASH_TABLE_SIZE = 1000;
 #endif
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
@@ -48,6 +49,12 @@ int main(int argc, char *argv[])
     }
 
 #if defined(HASH)
+    if (argc < 2) {
+        fprintf(stderr, "You must enter HASH_TABLE_SIZE!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    HASH_TABLE_SIZE = atoi(argv[1]);
     entry* hashTable[HASH_TABLE_SIZE];
     initHashTable(hashTable);
 #endif
