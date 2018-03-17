@@ -49,12 +49,6 @@ int main(int argc, char* argv[])
     }
 
 #if defined(HASH)
-    if (argc < 2) {
-        fprintf(stderr, "You must enter HASH_TABLE_SIZE!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    HASH_TABLE_SIZE = atoi(argv[1]);
     entry* hashTable[HASH_TABLE_SIZE];
     initHashTable(hashTable);
 #endif
@@ -114,9 +108,8 @@ int main(int argc, char* argv[])
 
 #if defined(HASH)
     FILE* output = fopen(OUT_FILE, "a");
-    fprintf(output, "%u %lf %lf\n", HASH_TABLE_SIZE, cpu_time1, cpu_time2);
+    fprintf(output, "append() findName() %lf %lf\n", cpu_time1, cpu_time2);
     fclose(output);
-
 #else
     FILE* output = fopen(OUT_FILE, "a");
     fprintf(output, "append() findName() %lf %lf\n", cpu_time1, cpu_time2);
