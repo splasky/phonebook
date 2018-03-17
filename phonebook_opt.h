@@ -3,6 +3,7 @@
 
 #define MAX_LAST_NAME_SIZE 16
 
+extern unsigned int HASH_TABLE_SIZE;
 #define OPT 1
 
 typedef struct __INNDER_DETAILS {
@@ -24,7 +25,6 @@ typedef struct __PHONE_BOOK_ENTRY {
     struct __PHONE_BOOK_ENTRY* pLast;
 } entry;
 
-#define HASH_TABLE_SIZE 1000
 typedef unsigned int (*hash_function)(const char* str, unsigned int length);
 
 entry* findName(char lastName[], entry* table[], hash_function func);
