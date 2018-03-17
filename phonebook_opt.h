@@ -17,6 +17,7 @@ typedef struct __PHONE_BOOK_ENTRY {
     char state[2];
     char zip[5];
     struct __PHONE_BOOK_ENTRY* pNext;
+    struct __PHONE_BOOK_ENTRY* pLast;
 } entry;
 
 typedef unsigned int (*hash_function)(const char* str, unsigned int length);

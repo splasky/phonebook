@@ -23,15 +23,15 @@ void append(char lastName[], entry* table[], hash_function func)
     unsigned hash_result = hash(lastName, func);
     entry* e = (entry*)malloc(sizeof(entry));
     e->pNext = NULL;
+    e->pLast = NULL;
     if (!table[hash_result]) {
         table[hash_result] = e;
+        e->pLast = e;
     } else {
         /* find empty space */
         entry* p = table[hash_result];
-        while (p->pNext) {
-            p = p->pNext;
-        }
-        p->pNext = e;
+        p->pLast->pNext = e;
+        p->pLast = e;
     }
     strcpy(e->lastName, lastName);
 }
