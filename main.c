@@ -112,12 +112,19 @@ int main(int argc, char *argv[])
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time2 = diff_in_second(start, end);
 
-    FILE *output = fopen(OUT_FILE, "a");
+#if defined(HASH)
+    FILE* output = fopen(OUT_FILE, "a");
+    fprintf(output, "%u %lf %lf\n", HASH_TABLE_SIZE, cpu_time1, cpu_time2);
+    fclose(output);
+
+#else
+    FILE* output = fopen(OUT_FILE, "a");
     fprintf(output, "append() findName() %lf %lf\n", cpu_time1, cpu_time2);
     fclose(output);
 
     printf("execution time of append() : %lf sec\n", cpu_time1);
     printf("execution time of findName() : %lf sec\n", cpu_time2);
+#endif
 
     if (pHead->pNext) free(pHead->pNext);
     free(pHead);
