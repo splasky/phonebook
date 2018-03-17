@@ -1,8 +1,8 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <assert.h>
 
 #include IMPL
 
@@ -17,25 +17,25 @@
 #ifdef HASH
 #include "./hash_function.h"
 hash_function default_hash_function = RSHASH;
-unsigned int HASH_TABLE_SIZE = 1000;
+unsigned int HASH_TABLE_SIZE = 1009;
 #endif
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {
     struct timespec diff;
-    if (t2.tv_nsec-t1.tv_nsec < 0) {
-        diff.tv_sec  = t2.tv_sec - t1.tv_sec - 1;
+    if (t2.tv_nsec - t1.tv_nsec < 0) {
+        diff.tv_sec = t2.tv_sec - t1.tv_sec - 1;
         diff.tv_nsec = t2.tv_nsec - t1.tv_nsec + 1000000000;
     } else {
-        diff.tv_sec  = t2.tv_sec - t1.tv_sec;
+        diff.tv_sec = t2.tv_sec - t1.tv_sec;
         diff.tv_nsec = t2.tv_nsec - t1.tv_nsec;
     }
     return (diff.tv_sec + diff.tv_nsec / 1000000000.0);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    FILE *fp;
+    FILE* fp;
     int i = 0;
     char line[MAX_LAST_NAME_SIZE];
     struct timespec start, end;
@@ -60,13 +60,13 @@ int main(int argc, char *argv[])
 #endif
     /* build the entry */
     entry *pHead, *e;
-    pHead = (entry *) malloc(sizeof(entry));
+    pHead = (entry*)malloc(sizeof(entry));
     printf("size of entry : %lu bytes\n", sizeof(entry));
     e = pHead;
     e->pNext = NULL;
 
 #if defined(__GNUC__)
-    __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
+    __builtin___clear_cache((char*)pHead, (char*)pHead + sizeof(entry));
 #endif
     clock_gettime(CLOCK_REALTIME, &start);
     while (fgets(line, sizeof(line), fp)) {
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(__GNUC__)
-    __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
+    __builtin___clear_cache((char*)pHead, (char*)pHead + sizeof(entry));
 #endif
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
