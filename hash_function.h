@@ -2,7 +2,7 @@
 #define HASH_FUNCTION_H_VDMEOP0X
 
 /* hash functions */
-unsigned int RSHASH(const char* str, unsigned int length);
+unsigned int RSHash(const char* str, unsigned int length);
 unsigned int JSHash(const char* str, unsigned int length);
 unsigned int PJWHash(const char* str, unsigned int length);
 unsigned int ELFHash(const char* str, unsigned int length);
