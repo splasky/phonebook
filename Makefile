@@ -20,10 +20,10 @@ phonebook_orig: $(SRCS_common) phonebook_orig.c phonebook_orig.h
 		-DIMPL="\"$@.h\"" -o $@ \
 		$(SRCS_common) $@.c
 
-phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h
+phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h mem_pool.o
 	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
-		-DIMPL="\"$@.h\"" -o $@ \
-		$(SRCS_common) $@.c
+		-DIMPL="\"$@.h\"" -DMEM_POOL -o $@ \
+		$(SRCS_common) $@.c mem_pool.o
 
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches

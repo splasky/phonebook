@@ -14,6 +14,12 @@
 
 #define DICT_FILE "./dictionary/words.txt"
 
+#if defined(MEM_POOL)
+#include "mem_pool.h"
+m_pool* pool = NULL;
+#define MEM_POOL_SIZE 100000000
+#endif
+
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {
     struct timespec diff;
@@ -42,6 +48,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+#if defined(MEM_POOL)
+    pool = pool_allocate(MEM_POOL_SIZE);
+#endif
     /* build the entry */
     entry *pHead, *e;
     pHead = (entry *) malloc(sizeof(entry));
@@ -92,7 +101,9 @@ int main(int argc, char *argv[])
     printf("execution time of append() : %lf sec\n", cpu_time1);
     printf("execution time of findName() : %lf sec\n", cpu_time2);
 
-    if (pHead->pNext) free(pHead->pNext);
+#if defined(MEM_POOL)
+    pool_free(pool);
+#endif
     free(pHead);
 
     return 0;
