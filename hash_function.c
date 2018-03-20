@@ -1,6 +1,6 @@
 #include "hash_function.h"
 
-unsigned int RSHASH(const char* str, unsigned int length)
+unsigned int RSHash(const char* str, unsigned int length)
 {
     unsigned int b = 478551;
     unsigned int a = 63689;
@@ -29,7 +29,8 @@ unsigned int PJWHash(const char* str, unsigned int length)
     const unsigned int BitsInUnsignedInt = (unsigned int)(sizeof(unsigned int) * 8);
     const unsigned int ThreeQuarters = (unsigned int)((BitsInUnsignedInt * 3) / 4);
     const unsigned int OneEighth = (unsigned int)(BitsInUnsignedInt / 8);
-    const unsigned int HighBits = (unsigned int)(0xFFFFFFFF) << (BitsInUnsignedInt - OneEighth);
+    const unsigned int HighBits = (unsigned int)(0xFFFFFFFF)
+                                  << (BitsInUnsignedInt - OneEighth);
     unsigned int hash = 0;
     unsigned int test = 0;
     unsigned int i = 0;
@@ -119,7 +120,8 @@ unsigned int APHash(const char* str, unsigned int length)
     unsigned int i = 0;
 
     for (i = 0; i < length; ++str, ++i) {
-        hash ^= ((i & 1) == 0) ? ((hash << 7) ^ (*str) * (hash >> 3)) : (~((hash << 11) + ((*str) ^ (hash >> 5))));
+        hash ^= ((i & 1) == 0) ? ((hash << 7) ^ (*str) * (hash >> 3))
+                : (~((hash << 11) + ((*str) ^ (hash >> 5))));
     }
 
     return hash;

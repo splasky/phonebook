@@ -5,9 +5,10 @@
 #include <time.h>
 
 #include IMPL
-
 #ifdef OPT
 #define OUT_FILE "opt.txt"
+#elif MEM_POOL
+#define OUT_FILE "mempool.txt"
 #else
 #define OUT_FILE "orig.txt"
 #endif
@@ -16,8 +17,14 @@
 
 #ifdef HASH
 #include "./hash_function.h"
-hash_function default_hash_function = RSHASH;
+hash_function default_hash_function = RSHash;
 unsigned int HASH_TABLE_SIZE = 1009;
+#endif
+
+#ifdef MEM_POOL
+#include "mem_pool.h"
+m_pool* pool = NULL;
+#define MEM_POOL_SIZE 100000000
 #endif
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
@@ -51,6 +58,9 @@ int main(int argc, char* argv[])
 #if defined(HASH)
     entry* hashTable[HASH_TABLE_SIZE];
     initHashTable(hashTable);
+#endif
+#if defined(MEM_POOL)
+    pool = pool_allocate(MEM_POOL_SIZE);
 #endif
     /* build the entry */
     entry *pHead, *e;
@@ -119,6 +129,9 @@ int main(int argc, char* argv[])
     printf("execution time of findName() : %lf sec\n", cpu_time2);
 #endif
 
+#if defined(MEM_POOL)
+    pool_free(pool);
+#else
     if (pHead->pNext) {
         while (pHead->pNext) {
             entry* cur = pHead->pNext;
@@ -126,6 +139,8 @@ int main(int argc, char* argv[])
             pHead = cur;
         }
     }
+
+#endif
     free(pHead);
 
     return 0;

@@ -3,7 +3,7 @@ CFLAGS_common ?= -Wall -std=gnu99
 CFLAGS_orig = -O0
 CFLAGS_opt  = -O0
 
-EXEC = phonebook_orig phonebook_opt
+EXEC = phonebook_orig phonebook_opt phonebook_mempool
 
 GIT_HOOKS := .git/hooks/applied
 .PHONY: all
@@ -24,6 +24,12 @@ phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h hash_function.o
 	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
 		-DIMPL="\"$@.h\"" -DHASH -o $@ \
 		$(SRCS_common) $@.c hash_function.o
+
+phonebook_mempool: $(SRCS_common) phonebook_mempool.c phonebook_mempool.h mem_pool.o
+	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
+		-DIMPL="\"$@.h\"" -DMEM_POOL -o $@ \
+		$(SRCS_common) $@.c mem_pool.o
+
 
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches

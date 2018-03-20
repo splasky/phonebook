@@ -9,10 +9,24 @@ char* hash_txt[] = { "aphash.txt", "bkdrhash.txt", "dekhash.txt", "djbhash.txt",
 #define num_of_hash_files 9
 #endif
 
+#ifdef OPT
+#define OUT_FILE "opt.txt"
+#endif
+
+#ifdef HASH
+#define OUT_FILE "hash.txt"
+#endif
+
+#ifdef MEM_POOL
+#define OUT_FILE "mempool.txt"
+#endif
+
+#define OUT_PUT "output.txt"
+
 int main(void)
 {
     FILE* fp = fopen("orig.txt", "r");
-    FILE* output = fopen("output.txt", "w");
+    FILE* output = fopen(OUT_PUT, "w");
     if (!fp) {
         printf("ERROR opening input file orig.txt\n");
         exit(0);

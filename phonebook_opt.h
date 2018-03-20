@@ -1,7 +1,10 @@
 #ifndef _PHONEBOOK_H
 #define _PHONEBOOK_H
+#include "mem_pool.h"
 
 #define MAX_LAST_NAME_SIZE 16
+#define OPT 1
+extern m_pool* pool;
 
 extern unsigned int HASH_TABLE_SIZE;
 #define OPT 1
