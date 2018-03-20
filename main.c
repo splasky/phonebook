@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include IMPL
+
 #ifdef OPT
 #define OUT_FILE "opt.txt"
 #elif MEM_POOL

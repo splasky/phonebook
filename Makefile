@@ -3,7 +3,7 @@ CFLAGS_common ?= -Wall -std=gnu99
 CFLAGS_orig = -O0
 CFLAGS_opt  = -O0
 
-EXEC = phonebook_orig phonebook_opt phonebook_mempool
+EXEC = phonebook_orig phonebook_opt phonebook_mempool phonebook_fuzzy
 
 GIT_HOOKS := .git/hooks/applied
 .PHONY: all
@@ -30,6 +30,10 @@ phonebook_mempool: $(SRCS_common) phonebook_mempool.c phonebook_mempool.h mem_po
 		-DIMPL="\"$@.h\"" -DMEM_POOL -o $@ \
 		$(SRCS_common) $@.c mem_pool.o
 
+phonebook_fuzzy: fuzzyfind.c phonebook_fuzzy.c phonebook_fuzzy.h fuzzy.o
+	$(CC) $(CFLAGS_common) -g $(CFLAGS_opt) \
+		-DIMPL="\"$@.h\"" -o $@ \
+		fuzzyfind.c $@.c fuzzy.o
 
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches
