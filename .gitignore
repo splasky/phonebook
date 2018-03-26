@@ -8,6 +8,8 @@
 phonebook_opt
 phonebook_orig
 phonebook_mempool
+phonebook_avltree
+phonebook_fuzzy
 calculate
 orig.txt
 opt.txt

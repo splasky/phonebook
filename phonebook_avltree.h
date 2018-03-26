@@ -1,8 +1,8 @@
 #ifndef _PHONEBOOK_H
 #define _PHONEBOOK_H
+#include "avltree.h"
 
 #define MAX_LAST_NAME_SIZE 16
-
 extern unsigned int HASH_TABLE_SIZE;
 #define OPT 1
 
@@ -22,14 +22,9 @@ typedef struct __PHONE_BOOK_ENTRY {
     char lastName[MAX_LAST_NAME_SIZE];
     details* detail;
     struct __PHONE_BOOK_ENTRY* pNext;
-    struct __PHONE_BOOK_ENTRY* pLast;
 } entry;
 
-typedef unsigned int (*hash_function)(const char* str, unsigned int length);
-
-entry* findName(char lastName[], entry* table[], hash_function func);
-void append(char lastName[], entry* table[], hash_function func);
-unsigned hash(char* name, hash_function func);
-void initHashTable(entry* table[]);
+entry* findName(char lastName[], AVLTreeNode* root);
+void append(char lastName[], AVLTreeNode** root, AVLTree_compare compare);
 
 #endif

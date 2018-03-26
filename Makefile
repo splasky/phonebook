@@ -3,7 +3,7 @@ CFLAGS_common ?= -Wall -std=gnu99
 CFLAGS_orig = -O0
 CFLAGS_opt  = -O0
 
-EXEC = phonebook_orig phonebook_opt phonebook_mempool phonebook_fuzzy
+EXEC = phonebook_orig phonebook_opt phonebook_mempool phonebook_fuzzy phonebook_avltree
 
 GIT_HOOKS := .git/hooks/applied
 .PHONY: all
@@ -34,6 +34,11 @@ phonebook_fuzzy: fuzzyfind.c phonebook_fuzzy.c phonebook_fuzzy.h fuzzy.o
 	$(CC) $(CFLAGS_common) -g $(CFLAGS_opt) \
 		-DIMPL="\"$@.h\"" -o $@ \
 		fuzzyfind.c $@.c fuzzy.o
+
+phonebook_avltree: $(SRCS_common) phonebook_avltree.c phonebook_avltree.h avltree.o
+	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
+		-DIMPL="\"$@.h\"" -DAVLTREE -o $@ \
+		$(SRCS_common) $@.c avltree.o
 
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches

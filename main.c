@@ -20,12 +20,17 @@
 #include "./hash_function.h"
 hash_function default_hash_function = RSHash;
 unsigned int HASH_TABLE_SIZE = 1009;
-#endif
-
-#ifdef MEM_POOL
+#elif MEM_POOL
 #include "mem_pool.h"
 m_pool* pool = NULL;
 #define MEM_POOL_SIZE 100000000
+#elif AVLTREE
+#include "avltree.h"
+#include "phonebook_avltree.h"
+int Default_AVL_Compare(const void* a, const void* b)
+{
+    return strcasecmp(a, b);
+}
 #endif
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
@@ -56,20 +61,20 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-#if defined(HASH)
+#ifdef HASH
     entry* hashTable[HASH_TABLE_SIZE];
     initHashTable(hashTable);
-#endif
-#if defined(MEM_POOL)
+#elif MEM_POOL
     pool = pool_allocate(MEM_POOL_SIZE);
+#elif AVLTREE
+    AVLTreeNode* root = NULL;
 #endif
     /* build the entry */
     entry *pHead, *e;
     pHead = (entry*)malloc(sizeof(entry));
-    printf("size of entry : %lu bytes\n", sizeof(entry));
+    printf("size of entry : %zu bytes\n", sizeof(entry));
     e = pHead;
     e->pNext = NULL;
-
 #if defined(__GNUC__)
     __builtin___clear_cache((char*)pHead, (char*)pHead + sizeof(entry));
 #endif
@@ -79,8 +84,10 @@ int main(int argc, char* argv[])
             i++;
         line[i - 1] = '\0';
         i = 0;
-#if defined(HASH)
+#ifdef HASH
         append(line, hashTable, default_hash_function);
+#elif AVLTREE
+        append(line, &root, Default_AVL_Compare);
 #else
         e = append(line, e);
 #endif
@@ -91,26 +98,21 @@ int main(int argc, char* argv[])
     /* close file as soon as possible */
     fclose(fp);
 
-    e = pHead;
-
     /* the givn last name to find */
     char input[MAX_LAST_NAME_SIZE] = "zyxel";
     e = pHead;
-
-#if defined(HASH)
-
-#else
-    assert(findName(input, e) && "Did you implement findName() in " IMPL "?");
-    assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
-#endif
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char*)pHead, (char*)pHead + sizeof(entry));
 #endif
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
-#if defined(HASH)
+#ifdef HASH
     findName(input, hashTable, default_hash_function);
+#elif AVLTREE
+    entry* ret = findName(input, root);
+    assert(ret != NULL);
+    printf("%s\n", ret->lastName);
 #else
     findName(input, e);
 #endif
@@ -130,8 +132,11 @@ int main(int argc, char* argv[])
     printf("execution time of findName() : %lf sec\n", cpu_time2);
 #endif
 
-#if defined(MEM_POOL)
+#ifdef MEM_POOL
     pool_free(pool);
+#elif AVLTREE
+    AVLTreeDestroy(&root);
+    free(root);
 #else
     if (pHead->pNext) {
         while (pHead->pNext) {
@@ -143,6 +148,5 @@ int main(int argc, char* argv[])
 
 #endif
     free(pHead);
-
     return 0;
 }
