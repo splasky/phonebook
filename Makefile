@@ -3,7 +3,7 @@ CFLAGS_common ?= -Wall -std=gnu99
 CFLAGS_orig = -O0
 CFLAGS_opt  = -O0
 
-EXEC = phonebook_orig phonebook_opt phonebook_mempool phonebook_fuzzy phonebook_avltree
+EXEC = phonebook_orig phonebook_opt phonebook_mempool phonebook_fuzzy phonebook_avltree phonebook_smaz
 
 GIT_HOOKS := .git/hooks/applied
 .PHONY: all
@@ -40,6 +40,16 @@ phonebook_avltree: $(SRCS_common) phonebook_avltree.c phonebook_avltree.h avltre
 		-DIMPL="\"$@.h\"" -DAVLTREE -o $@ \
 		$(SRCS_common) $@.c avltree.o
 
+phonebook_smaz: $(SRCS_common) phonebook_smaz.c phonebook_smaz.h smaz/smaz.o
+	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
+		-DIMPL="\"$@.h\"" -o $@ \
+		$(SRCS_common) $@.c smaz/smaz.o
+
+smaz.o:smaz/smaz.c smaz/smaz.h
+	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
+		-o $@ $(SRCS_common) $@.c
+
+
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches
 	watch -d -t "./phonebook_orig && echo 3 | sudo tee /proc/sys/vm/drop_caches"
@@ -50,7 +60,7 @@ cache-test: $(EXEC)
 		./phonebook_orig
 	perf stat --repeat 100 \
 		-e cache-misses,cache-references,instructions,cycles \
-		./phonebook_opt
+		./phonebook_smaz
 
 output.txt: cache-test calculate
 	./calculate
