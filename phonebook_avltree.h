@@ -3,8 +3,6 @@
 #include "avltree.h"
 
 #define MAX_LAST_NAME_SIZE 16
-extern unsigned int HASH_TABLE_SIZE;
-#define OPT 1
 
 typedef struct __INNDER_DETAILS {
     char firstName[16];
