@@ -3,7 +3,7 @@ CFLAGS_common ?= -Wall -std=gnu99
 CFLAGS_orig = -O0
 CFLAGS_opt  = -O0
 
-EXEC = phonebook_orig phonebook_opt phonebook_mempool phonebook_fuzzy phonebook_avltree phonebook_smaz
+EXEC = phonebook_orig phonebook_mempool phonebook_fuzzy phonebook_avltree phonebook_smaz phonebook_hash phonebook_opt
 
 GIT_HOOKS := .git/hooks/applied
 .PHONY: all
@@ -20,7 +20,12 @@ phonebook_orig: $(SRCS_common) phonebook_orig.c phonebook_orig.h
 		-DIMPL="\"$@.h\"" -o $@ \
 		$(SRCS_common) $@.c
 
-phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h hash_function.o
+phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h hash_function.o mem_pool.o avltree.o smaz/smaz.o
+	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
+		-DIMPL="\"$@.h\"" -o $@ \
+		$(SRCS_common) $@.c hash_function.o mem_pool.o avltree.o smaz/smaz.o
+
+phonebook_hash: $(SRCS_common) phonebook_hash.c phonebook_hash.h hash_function.o
 	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
 		-DIMPL="\"$@.h\"" -DHASH -o $@ \
 		$(SRCS_common) $@.c hash_function.o
@@ -32,7 +37,7 @@ phonebook_mempool: $(SRCS_common) phonebook_mempool.c phonebook_mempool.h mem_po
 
 phonebook_fuzzy: fuzzyfind.c phonebook_fuzzy.c phonebook_fuzzy.h fuzzy.o
 	$(CC) $(CFLAGS_common) -g $(CFLAGS_opt) \
-		-DIMPL="\"$@.h\"" -o $@ \
+		-DIMPL="\"$@.h\"" -DFUZZY -o $@ \
 		fuzzyfind.c $@.c fuzzy.o
 
 phonebook_avltree: $(SRCS_common) phonebook_avltree.c phonebook_avltree.h avltree.o
@@ -42,13 +47,8 @@ phonebook_avltree: $(SRCS_common) phonebook_avltree.c phonebook_avltree.h avltre
 
 phonebook_smaz: $(SRCS_common) phonebook_smaz.c phonebook_smaz.h smaz/smaz.o
 	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
-		-DIMPL="\"$@.h\"" -o $@ \
+		-DIMPL="\"$@.h\"" -DSMAZ -o $@ \
 		$(SRCS_common) $@.c smaz/smaz.o
-
-smaz.o:smaz/smaz.c smaz/smaz.h
-	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
-		-o $@ $(SRCS_common) $@.c
-
 
 run: $(EXEC)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches
@@ -60,7 +60,7 @@ cache-test: $(EXEC)
 		./phonebook_orig
 	perf stat --repeat 100 \
 		-e cache-misses,cache-references,instructions,cycles \
-		./phonebook_smaz
+		./phonebook_opt
 
 output.txt: cache-test calculate
 	./calculate

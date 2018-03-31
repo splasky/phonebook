@@ -8,29 +8,39 @@
 
 #ifdef OPT
 #define OUT_FILE "opt.txt"
+#elif HASH
+#define OUT_FILE "hash.txt"
 #elif MEM_POOL
 #define OUT_FILE "mempool.txt"
+#elif FUZZY
+#define OUT_FILE "fuzzy.txt"
+#elif AVLTREE
+#define OUT_FILE "avltree.txt"
+#elif SMAZ
+#define OUT_FILE "smaz.txt"
 #else
 #define OUT_FILE "orig.txt"
 #endif
 
 #define DICT_FILE "./dictionary/words.txt"
 
-#ifdef HASH
-#include "./hash_function.h"
-hash_function default_hash_function = RSHash;
-unsigned int HASH_TABLE_SIZE = 1009;
-#elif MEM_POOL
+#if defined(HASH) || defined(OPT)
+#include "hash_function.h"
+static hash_function default_hash_function = ELFHash;
+static unsigned int HASH_TABLE_SIZE = 30011;
+#elif defined(MEM_POOL)
 #include "mem_pool.h"
 m_pool* pool = NULL;
 #define MEM_POOL_SIZE 100000000
-#elif AVLTREE
+#elif defined(AVLTREE)
 #include "avltree.h"
 #include "phonebook_avltree.h"
 int Default_AVL_Compare(const void* a, const void* b)
 {
     return strcasecmp(a, b);
 }
+#elif defined(SMAZ)
+#include "smaz/smaz.h"
 #endif
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
@@ -63,18 +73,24 @@ int main(int argc, char* argv[])
 
 #ifdef HASH
     entry* hashTable[HASH_TABLE_SIZE];
-    initHashTable(hashTable);
+    initHashTable(hashTable, HASH_TABLE_SIZE);
 #elif MEM_POOL
     pool = pool_allocate(MEM_POOL_SIZE);
 #elif AVLTREE
     AVLTreeNode* root = NULL;
+#elif OPT
+    AVLTreeNode* bigTable[HASH_TABLE_SIZE];
+    initBigTable(bigTable, HASH_TABLE_SIZE);
 #endif
     /* build the entry */
     entry *pHead, *e;
     pHead = (entry*)malloc(sizeof(entry));
     printf("size of entry : %zu bytes\n", sizeof(entry));
     e = pHead;
+#ifndef OPT
     e->pNext = NULL;
+#endif
+
 #if defined(__GNUC__)
     __builtin___clear_cache((char*)pHead, (char*)pHead + sizeof(entry));
 #endif
@@ -85,9 +101,11 @@ int main(int argc, char* argv[])
         line[i - 1] = '\0';
         i = 0;
 #ifdef HASH
-        append(line, hashTable, default_hash_function);
+        append(line, hashTable, default_hash_function, HASH_TABLE_SIZE);
 #elif AVLTREE
         append(line, &root, Default_AVL_Compare);
+#elif OPT
+        append(line, bigTable, default_hash_function, HASH_TABLE_SIZE);
 #else
         e = append(line, e);
 #endif
@@ -108,11 +126,18 @@ int main(int argc, char* argv[])
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
 #ifdef HASH
-    findName(input, hashTable, default_hash_function);
+    findName(input, hashTable, default_hash_function, HASH_TABLE_SIZE);
 #elif AVLTREE
     entry* ret = findName(input, root);
     assert(ret != NULL);
-    printf("%s\n", ret->lastName);
+#elif SMAZ
+    char compressed[MAX_LAST_NAME_SIZE];
+    memset(compressed, '\0', MAX_LAST_NAME_SIZE);
+    smaz_compress(input, MAX_LAST_NAME_SIZE, compressed, MAX_LAST_NAME_SIZE);
+    findName(compressed, e);
+#elif OPT
+    entry* ret = findName(input, bigTable, default_hash_function, HASH_TABLE_SIZE);
+    assert(ret != NULL);
 #else
     findName(input, e);
 #endif
@@ -137,6 +162,8 @@ int main(int argc, char* argv[])
 #elif AVLTREE
     AVLTreeDestroy(&root);
     free(root);
+#elif OPT
+
 #else
     if (pHead->pNext) {
         while (pHead->pNext) {
@@ -145,7 +172,6 @@ int main(int argc, char* argv[])
             pHead = cur;
         }
     }
-
 #endif
     free(pHead);
     return 0;

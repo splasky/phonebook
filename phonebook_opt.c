@@ -2,49 +2,57 @@
 #include <string.h>
 #include <strings.h>
 
+#include "avltree.h"
+#include "mem_pool.h"
 #include "phonebook_opt.h"
+#include "smaz/smaz.h"
 
-entry* findName(char lastName[], entry* table[], hash_function func)
+static m_pool* mem_pool = NULL;
+
+static int Default_AVL_Compare(const void* a, const void* b)
 {
-    unsigned hash_result = hash(lastName, func);
-    entry* pHead = table[hash_result];
-    while (pHead) {
-        if (strcasecmp(lastName, pHead->lastName) == 0) {
-            return pHead;
-        }
-        pHead = pHead->pNext;
-    }
+    return strcasecmp(a, b);
+}
+
+entry* findName(char lastName[], AVLTreeNode* table[], hash_function func,
+                unsigned int hash_table_size)
+{
+    char compressed[MAX_LAST_NAME_SIZE];
+    memset(compressed, '\0', MAX_LAST_NAME_SIZE);
+    smaz_compress(lastName, strlen(lastName), compressed, MAX_LAST_NAME_SIZE);
+    unsigned int hash_result = hash(compressed, func, hash_table_size);
+
+    AVLTreeNode* root = table[hash_result];
+    void* data = AVLTreeFind(root, compressed);
+    if (data)
+        return (entry*)data;
+
     /* find nothing */
     return NULL;
 }
 
-void append(char lastName[], entry* table[], hash_function func)
+void append(char lastName[], AVLTreeNode* table[], hash_function func,
+            unsigned int hash_table_size)
 {
-    unsigned hash_result = hash(lastName, func);
-    entry* e = (entry*)malloc(sizeof(entry));
-    e->pNext = NULL;
-    e->pLast = NULL;
+    entry* e = (entry*)pool_access(mem_pool, sizeof(entry));
+    smaz_compress(lastName, strlen(lastName), e->lastName, sizeof(e->lastName));
+    unsigned int hash_result = hash(e->lastName, func, hash_table_size);
+
     if (!table[hash_result]) {
-        table[hash_result] = e;
-        e->pLast = e;
+        AVLTreeNode* root = NULL;
+        AVLTreeInsert(&root, e->lastName, e, Default_AVL_Compare);
+        table[hash_result] = root;
     } else {
         /* find empty space */
-        entry* p = table[hash_result];
-        p->pLast->pNext = e;
-        p->pLast = e;
+        /* use avltree */
+        AVLTreeInsert(&table[hash_result], e->lastName, e, Default_AVL_Compare);
     }
-    strcpy(e->lastName, lastName);
 }
 
-unsigned hash(char* name, hash_function func)
+void initBigTable(AVLTreeNode* table[], unsigned int hash_table_size)
 {
-    unsigned ret = func(name, strlen(name));
-    return ret % HASH_TABLE_SIZE;
-}
-
-void initHashTable(entry* table[])
-{
-    for (int i = 0; i < HASH_TABLE_SIZE; ++i) {
+    mem_pool = pool_allocate(MEM_POOL_SIZE);
+    for (int i = 0; i < hash_table_size; ++i) {
         table[i] = NULL;
     }
 }
