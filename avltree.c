@@ -85,7 +85,7 @@ static void AVLTree_Reblance(AVLTreeNode** root)
 
 void AVLTreeInsert(AVLTreeNode** root, void* key, void* data, AVLTree_compare compare)
 {
-    if (*root == 0) {
+    if (*root == 0 || *root == NULL) {
         AVLTreeNode* e = Create_AVLTreeNode(key, data, compare);
         *root = e;
     } else if ((*root)->compare(key, (*root)->key) == 0) {
