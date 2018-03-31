@@ -3,7 +3,6 @@
 #include "mem_pool.h"
 
 #define MAX_LAST_NAME_SIZE 16
-#define OPT 1
 extern m_pool* pool;
 
 typedef struct __PHONE_BOOK_ENTRY {
@@ -17,10 +16,10 @@ typedef struct __PHONE_BOOK_ENTRY {
     char city[16];
     char state[2];
     char zip[5];
-    struct __PHONE_BOOK_ENTRY *pNext;
+    struct __PHONE_BOOK_ENTRY* pNext;
 } entry;
 
-entry *findName(char lastName[], entry *pHead);
-entry *append(char lastName[], entry *e);
+entry* findName(char lastName[], entry* pHead);
+entry* append(char lastName[], entry* e);
 
 #endif
