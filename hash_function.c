@@ -1,4 +1,11 @@
 #include "hash_function.h"
+#include <string.h>
+
+unsigned hash(char* name, hash_function func, unsigned int hash_table_size)
+{
+    unsigned ret = func(name, strlen(name));
+    return ret % hash_table_size;
+}
 
 unsigned int RSHash(const char* str, unsigned int length)
 {

@@ -1,6 +1,8 @@
 #ifndef HASH_FUNCTION_H_VDMEOP0X
 #define HASH_FUNCTION_H_VDMEOP0X
 
+typedef unsigned int (*hash_function)(const char* str, unsigned int length);
+unsigned hash(char* name, hash_function func, unsigned int hash_table_size);
 /* hash functions */
 unsigned int RSHash(const char* str, unsigned int length);
 unsigned int JSHash(const char* str, unsigned int length);
