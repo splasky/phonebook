@@ -10,6 +10,8 @@ phonebook_orig
 phonebook_mempool
 phonebook_avltree
 phonebook_fuzzy
+phonebook_smaz
+phonebook_hash
 calculate
 orig.txt
 opt.txt
